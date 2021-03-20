@@ -1,0 +1,78 @@
+apply from: this.file('common.gradle')
+
+/**
+ * 配置此项目的构建脚本类路径
+ */
+buildscript { ScriptHandler scriptHandler ->
+    /**
+     * 配置工程插件的仓库地址
+     */
+    scriptHandler.repositories { RepositoryHandler repositoryHandler ->
+        repositoryHandler.google()
+        repositoryHandler.jcenter()
+        repositoryHandler.maven {
+            name 'personal'
+            url 'http://localhost:8081/nexus/repositories'
+            credentials {
+                username = 'admin'
+                password = 'admin123'
+            }
+        }
+    }
+    /**
+     * 配置工程的插件依赖地址
+     */
+    scriptHandler.dependencies {
+        classpath "com.android.tools.build:gradle:4.0.1"
+
+    }
+}
+
+/**
+ * 配置当前节点和所有子节点
+ */
+allprojects {
+    group 'com.iamzzj'
+    version '1.0.0-release'
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+/**
+ * 不包括自己，包括全部子工程
+ */
+subprojects { Project project ->
+    if (project.plugins.hasPlugin('com.android.library')) {
+        apply from: '../publishToMaven.gradle'
+    }
+}
+
+getRootDir().absolutePath
+getBuildDir().absolutePath
+getProjectDir().absolutePath
+
+/**
+ * project相关api讲解
+ */
+this.getAllprojects()
+
+/**
+ * 子project
+ */
+this.getSubprojects()
+
+/**
+ * 父project
+ */
+this.getParent()
+
+project('app') { Project project ->
+}
+
+println project('app').group
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
